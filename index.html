@@ -4,109 +4,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DungeonScript | Language Specification</title>
-    <!-- GitHub Markdown CSS for a professional technical look -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
     <style>
-        body { box-sizing: border-box; min-width: 200px; max-width: 980px; margin: 0 auto; padding: 45px; }
-        @media (max-width: 767px) { body { padding: 15px; } }
-        
-        .nav-wrapper { position: fixed; left: 20px; top: 50px; width: 180px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-        .nav-wrapper ul { list-style: none; padding: 0; }
-        .nav-wrapper li { margin-bottom: 8px; }
-        .nav-wrapper a { text-decoration: none; color: #0969da; font-size: 14px; }
-        .nav-wrapper a:hover { text-decoration: underline; }
-        
-        /* Offset for anchor links so they don't hide under the top of the browser */
-        section { scroll-margin-top: 50px; margin-bottom: 60px; }
-        
-        /* Adjust main body for sidebar on large screens */
-        @media (min-width: 1200px) {
-            body { margin-left: 250px; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d1117; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
         }
-        @media (max-width: 1199px) {
-            .nav-wrapper { position: static; width: 100%; border-bottom: 1px solid #d0d7de; padding-bottom: 20px; margin-bottom: 20px; }
+
+        .page-wrapper {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar: Now firmly separated from content */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            padding: 40px 30px;
+            border-right: 1px solid #30363d;
+            background-color: #0d1117;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar h3 {
+            color: #e6edf3;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            color: #2f81f7;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .sidebar a:hover {
+            color: #58a6ff;
+            text-decoration: underline;
+        }
+
+        /* Main Content */
+        .content {
+            flex-grow: 1;
+            padding: 40px 60px;
+            background-color: #0d1117;
+            min-width: 0; 
+        }
+
+        section {
+            margin-bottom: 60px;
+            scroll-margin-top: 40px;
+        }
+
+        pre {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+        }
+
+        /* Responsive design */
+        @media (max-width: 900px) {
+            .page-wrapper { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #30363d;
+                padding: 20px;
+            }
+            .content { padding: 30px 20px; }
         }
     </style>
 </head>
-<body class="markdown-body">
-    <nav class="nav-wrapper">
-        <h3>Contents</h3>
+<body>
+
+<div class="page-wrapper">
+    <nav class="sidebar">
+        <h3>DungeonScript</h3>
         <ul>
             <li><a href="#intro">Introduction</a></li>
-            <li><a href="#types">Core Entity Types</a></li>
+            <li><a href="#entities">Entity Types</a></li>
             <li><a href="#stats">Stats & Modifiers</a></li>
             <li><a href="#grammar">Language Grammar</a></li>
             <li><a href="#safety">Compiler Safety</a></li>
-            <li><a href="#full-example">Comprehensive Example</a></li>
+            <li><a href="#examples">Full Example</a></li>
         </ul>
     </nav>
 
-    <header id="intro">
-        <h1>DungeonScript Specification</h1>
-        <p><strong>DungeonScript</strong> is a domain-specific scripting language designed to streamline TTRPG campaign preparation. It provides Game Masters with a structured way to define world entities that can be exported to Markdown or JSON for use in apps like <strong>Obsidian</strong> or <strong>FoundryVTT</strong>.</p>
-    </header>
+    <main class="content markdown-body">
+        <section id="intro">
+            <h1>DungeonScript Specification</h1>
+            <p>DungeonScript is a domain-specific language (DSL) tailored for TTRPG Game Masters. It allows you to define complex NPCs, locations, and encounters using a readable, structured syntax that compiles into usable formats for VTTs and note-taking apps.</p>
+        </section>
 
-    <section id="types">
-        <h2>Core Entity Types</h2>
-        <p>DungeonScript is built around three fundamental building blocks:</p>
-        <ul>
-            <li><strong>NPC</strong>: Represents characters with attributes, saving throws, and actions.</li>
-            <li><strong>Location</strong>: Defines physical settings that can host NPCs and Encounters.</li>
-            <li><strong>Encounter</strong>: Represents specific events or combat scenarios.</li>
-        </ul>
-    </section>
+        <section id="entities">
+            <h2>Core Entity Types</h2>
+            <p>DungeonScript operates on three primary entity declarations:</p>
+            <ul>
+                <li><strong>NPC</strong>: The central unit for characters, containing stats, saving throws, and actions.</li>
+                <li><strong>Location</strong>: A container for world-building, capable of nesting NPCs and Encounters.</li>
+                <li><strong>Encounter</strong>: A tactical block used to define combat or social challenges.</li>
+            </ul>
+        </section>
 
-    <section id="stats">
-        <h2>Stats & Modifiers</h2>
-        <p>One of the core features of DungeonScript is the automatic derivation of ability modifiers. When a GM defines a stat value, the compiler calculates the modifier using the standard TTRPG formula:</p>
-        <p><code>Modifier = floor((Value - 10) / 2)</code></p>
-        <p>These modifiers can be dynamically referenced in <strong>Action</strong> damage strings using keywords like <code>STR</code> or <code>DEX</code>.</p>
-    </section>
+        <section id="stats">
+            <h2>Stats & Modifiers</h2>
+            <p>Modifiers are the backbone of TTRPG mechanics. DungeonScript automates this calculation using the standard formula:</p>
+            <pre><code>Modifier = floor((BaseStat - 10) / 2)</code></pre>
+            <p>When an NPC is defined with a stat like <code>STR: 18</code>, the compiler internally calculates a <code>+4</code> modifier. These can be dynamically referenced in <strong>Action</strong> damage strings using keywords like <code>STR</code>, <code>DEX</code>, or <code>PROF</code>.</p>
+        </section>
 
-    <section id="grammar">
-        <h2>Language Grammar</h2>
-        <p>DungeonScript uses the <strong>Ohm.js</strong> parsing library to ensure all files follow a strict, logical structure.</p>
-        <pre><code>NPC = "NPC" string "{" NPCBody "}"
+        <section id="grammar">
+            <h2>Language Grammar</h2>
+            <p>The syntax is strictly enforced by an <strong>Ohm.js</strong> grammar to ensure data consistency across your campaign files.</p>
+            <pre><code>NPC = "NPC" string "{" NPCBody "}"
 Location = "Location" string "{" LocationBody "}"
 Property = identifier ":" (number | string)
 StatBlock = "stats" "{" Stat* "}"
 Action = "Action" string "{" ActionBody "}"</code></pre>
-    </section>
+        </section>
 
-    <section id="safety">
-        <h2>Compiler Safety & Defaults</h2>
-        <p>To prevent campaign-breaking errors, the DungeonScript compiler includes several safety "guards":</p>
-        <ul>
-            <li><strong>HP Validation</strong>: The analyzer throws an error if an NPC is defined with 0 or negative HP.</li>
-            <li><strong>Null Safety</strong>: If a stat is missing, the compiler defaults the value to 10 (+0 modifier) to ensure the game remains playable.</li>
-            <li><strong>Proficiency Defaults</strong>: NPCs default to a +2 proficiency bonus unless explicitly changed.</li>
-        </ul>
-    </section>
+        <section id="safety">
+            <h2>Compiler Safety & Validation</h2>
+            <p>The compiler includes built-in semantic checks to catch common preparation errors before they reach your game table:</p>
+            <ul>
+                <li><strong>HP Validation</strong>: Ensures all NPCs have a health pool greater than 0.</li>
+                <li><strong>Null Safety</strong>: Missing stats default to 10 (+0) to ensure compatibility with VTT importers.</li>
+                <li><strong>Reference Checks</strong>: Ensures that damage strings only reference valid stat abbreviations.</li>
+            </ul>
+        </section>
 
-    <section id="full-example">
-        <h2>Comprehensive Example</h2>
-        <p>This example demonstrates entity nesting and property assignment.</p>
-        <pre><code>NPC "Brog the Orc" {
-  stats {
-    STR: 18, DEX: 12, CON: 16, HP: 45, AC: 16
-  }
-  
-  Action "Greataxe" {
-    type: "melee", damage: "1d12 + STR"
-  }
+        <section id="examples">
+            <h2>Complete Example</h2>
+            <p>A full <code>.ds</code> file demonstrating how entities relate to one another:</p>
+            <pre><code>NPC "Goblin" {
+  stats { DEX: 14, HP: 7, AC: 13 }
+  Action "Nimble Escape" { type: "utility" }
 }
 
-Location "The Rusty Tankard" {
-  safety: "Safe"
-  environment: "Noisy"
-  
-  "Brog the Orc" // Nesting the NPC inside the Location
+Location "Cragmaw Hideout" {
+  environment: "Cave"
+  "Goblin" 
 }</code></pre>
-    </section>
+        </section>
 
-    <footer>
-        <hr>
-        <p>DungeonScript is maintained by Haley Hadiwidjojo. Built with <a href="https://ohmjs.org">Ohm.js</a>.</p>
-    </footer>
+        <footer style="margin-top: 80px; font-size: 0.85rem; color: #8b949e; border-top: 1px solid #30363d; padding-top: 20px;">
+            <p>Documentation for DungeonScript v1.0. Created by Haley Hadiwidjojo. Built with Ohm.js.</p>
+        </footer>
+    </main>
+</div>
+
 </body>
 </html>
