@@ -112,6 +112,7 @@
             <li><a href="#examples">Examples</a></li>
             <li><a href="#markdown">Markdown Output</a></li>
             <li><a href="#json-conversion">JSON Conversion</a></li>
+            <li><a href="#cli">CLI Commands</a></li>
         </ul>
     </nav>
 
@@ -470,6 +471,48 @@ const ast = convertMonsterToAST(jsonMonster)
 // Or use the compiler pipeline:
 import compile from "./src/compiler.js"
 const source = compile(jsonSource, "js") // Convert to Markdown</code></pre>
+
+            <h3>CLI Command</h3>
+            <p>To convert a JSON monster file to DungeonScript using the command line:</p>
+            <pre><code>npm run generate-ds path/to/monster.json</code></pre>
+            <p>This will output the generated DungeonScript source to stdout.</p>
+        </section>
+
+        <section id="cli">
+            <h2>CLI Commands</h2>
+            <p>DungeonScript provides the following command-line tools:</p>
+
+            <h3>JSON to DungeonScript Conversion</h3>
+            <pre><code>npm run generate-ds &lt;path-to-json-file&gt;</code></pre>
+            <p>Converts a JSON monster file to DungeonScript source code and outputs to stdout.</p>
+            <p><strong>Example:</strong></p>
+            <pre><code>npm run generate-ds ./examples/goblin.json</code></pre>
+
+            <h3>DungeonScript to Markdown Conversion</h3>
+            <p>Currently, DungeonScript-to-Markdown conversion is available through the programmatic API:</p>
+            <pre><code>import compile from "./src/compiler.js"
+
+const dungeonScriptSource = `NPC "Goblin" { ... }`
+const markdown = compile(dungeonScriptSource, "js")
+console.log(markdown)</code></pre>
+
+            <h3>Compiler Pipeline Modes</h3>
+            <p>The compiler supports multiple output modes via the programmatic API:</p>
+            <ul>
+                <li><code>"parsed"</code> — Validates syntax and returns "Syntax is ok"</li>
+                <li><code>"analyzed"</code> — Returns semantic AST with Program, NPC, Location, and Encounter objects</li>
+                <li><code>"optimized"</code> — Returns normalized AST after merging duplicates</li>
+                <li><code>"js"</code> — Generates Markdown output from the optimized AST</li>
+            </ul>
+            <p><strong>Example usage:</strong></p>
+            <pre><code>import compile from "./src/compiler.js"
+
+const source = `NPC "Goblin" { stats { STR: 14 } }`
+
+const syntax = compile(source, "parsed")           // "Syntax is ok"
+const analyzed = compile(source, "analyzed")       // AST
+const optimized = compile(source, "optimized")     // Normalized AST
+const markdown = compile(source, "js")             // Markdown output</code></pre>
         </section>
     </main>
 </div>
