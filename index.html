@@ -109,7 +109,6 @@
             <li><a href="#print">Print Statement</a></li>
             <li><a href="#compiler">Compiler Features</a></li>
             <li><a href="#grammar">Grammar</a></li>
-            <li><a href="#examples">Examples</a></li>
             <li><a href="#markdown">Markdown Output</a></li>
             <li><a href="#json-conversion">JSON Conversion</a></li>
             <li><a href="#cli">CLI Commands</a></li>
@@ -215,7 +214,7 @@ saving_throws {
             <pre><code>action "Scimitar" {
   type: "melee"
   damage: "1d6 + STR + PROF"
-  description: "A curved blade attack"
+  description: "Slashing"
 }</code></pre>
             <p>The damage string can include dice notation and modifier references like STR, DEX, CON, INT, WIS, CHA, PROF.</p>
         </section>
@@ -298,53 +297,6 @@ saving_throws {
     keyword     = "NPC" | "Location" | "Encounter" | "stats" | "saving_throws" | "action" | "print"
     str         = "\"" (~"\"" any)* "\""
 }</code></pre>
-        </section>
-
-        <section id="examples">
-            <h2>Examples</h2>
-            <p>Here are complete examples demonstrating DungeonScript syntax:</p>
-            
-            <h3>NPC Example</h3>
-            <pre><code>NPC "Goblin" {
-  stats {
-    STR: 8
-    DEX: 14
-    CON: 10
-    INT: 10
-    WIS: 8
-    CHA: 8
-    HP: 7
-    AC: 15
-    proficiency: 2
-  }
-  saving_throws {
-    STR: -1
-    DEX: 2
-  }
-  action "Scimitar" {
-    type: "melee"
-    damage: "1d6 + STR + PROF"
-  }
-}</code></pre>
-
-            <h3>Location with Nesting</h3>
-            <pre><code>Location "Cragmaw Hideout" {
-  safety: 8
-  environment: "Cave"
-  NPC "Guard" {
-    stats {
-      HP: 20
-    }
-  }
-  Encounter "Ambush" {
-    difficulty: "medium"
-    type: "trap"
-    description: "A hidden pit in the corridor."
-  }
-}</code></pre>
-
-            <h3>Print Statement</h3>
-            <pre><code>print("The party hears distant footsteps.");</code></pre>
         </section>
 
         <section id="markdown">
