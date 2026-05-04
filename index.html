@@ -100,11 +100,16 @@
         <h3>DungeonScript</h3>
         <ul>
             <li><a href="#intro">Introduction</a></li>
+            <li><a href="#overview">Language Overview</a></li>
             <li><a href="#entities">Entity Types</a></li>
+            <li><a href="#properties">Properties & Values</a></li>
             <li><a href="#stats">Stats & Modifiers</a></li>
-            <li><a href="#grammar">Language Grammar</a></li>
-            <li><a href="#safety">Compiler Safety</a></li>
-            <li><a href="#examples">Full Example</a></li>
+            <li><a href="#actions">Actions</a></li>
+            <li><a href="#nesting">Nesting</a></li>
+            <li><a href="#print">Print Statement</a></li>
+            <li><a href="#grammar">Grammar</a></li>
+            <li><a href="#examples">Examples</a></li>
+            <li><a href="#compiler">Compiler Features</a></li>
         </ul>
     </nav>
 
@@ -112,57 +117,231 @@
         <section id="intro">
             <h1>DungeonScript Specification</h1>
             <p>DungeonScript is a domain-specific language (DSL) tailored for TTRPG Game Masters. It allows you to define complex NPCs, locations, and encounters using a readable, structured syntax that compiles into usable formats for VTTs and note-taking apps.</p>
+            
+            <p>This document defines the DungeonScript language.</p>
+
+            <pre><code>NPC "Goblin" {
+  stats {
+    STR: 8
+    DEX: 14
+    CON: 10
+    INT: 10
+    WIS: 8
+    CHA: 8
+    HP: 7
+    AC: 15
+    proficiency: 2
+  }
+  saving_throws {
+    STR: -1
+    DEX: 2
+  }
+  action "Scimitar" {
+    type: "melee"
+    damage: "1d6 + STR + PROF"
+  }
+}
+
+Location "Cragmaw Hideout" {
+  safety: 8
+  environment: "Cave"
+  NPC "Guard" {
+    stats {
+      HP: 20
+    }
+  }
+  Encounter "Ambush" {
+    difficulty: "medium"
+  }
+}
+
+print("The party hears distant footsteps.");</code></pre>
+        </section>
+
+        <section id="overview">
+            <h2>Language Overview</h2>
+            <p>A DungeonScript program consists of one or more declarations. Declarations define entities such as NPCs, Locations, and Encounters. The language supports nesting of entities within Locations and Encounters, custom properties, stat blocks with automatic modifier calculation, and a simple print statement for narrative elements.</p>
+            <p>The language is statically validated by an Ohm.js grammar, ensuring consistency and preventing common errors in TTRPG preparation.</p>
         </section>
 
         <section id="entities">
-            <h2>Core Entity Types</h2>
+            <h2>Entity Types</h2>
             <p>DungeonScript operates on three primary entity declarations:</p>
             <ul>
-                <li><strong>NPC</strong>: The central unit for characters, containing stats, saving throws, and actions.</li>
-                <li><strong>Location</strong>: A container for world-building, capable of nesting NPCs and Encounters.</li>
-                <li><strong>Encounter</strong>: A tactical block used to define combat or social challenges.</li>
+                <li><strong>NPC</strong>: Represents characters or creatures, containing stats, saving throws, actions, and custom properties.</li>
+                <li><strong>Location</strong>: A container for world-building, capable of nesting NPCs and Encounters with environmental properties.</li>
+                <li><strong>Encounter</strong>: Defines tactical or social challenges, which can contain nested entities and properties.</li>
             </ul>
+            <p>Entities can be nested: NPCs and Encounters can appear inside Locations or other Encounters, allowing hierarchical world-building.</p>
+        </section>
+
+        <section id="properties">
+            <h2>Properties & Values</h2>
+            <p>Entities can have custom properties defined as key-value pairs. Property keys are identifiers, and values can be numbers, strings (in quotes), or identifiers.</p>
+            <pre><code>property = identifier ":" value
+value = number | string | identifier</code></pre>
+            <p>Examples:</p>
+            <pre><code>difficulty: "medium"
+safety: 8
+environment: "Cave"</code></pre>
         </section>
 
         <section id="stats">
             <h2>Stats & Modifiers</h2>
-            <p>Modifiers are the backbone of TTRPG mechanics. DungeonScript automates this calculation using the standard formula:</p>
+            <p>NPCs can have stat blocks and saving throw blocks. Stats are defined as ability scores (STR, DEX, CON, INT, WIS, CHA) and other attributes like HP, AC, proficiency.</p>
+            <p>Modifiers are automatically calculated using the standard TTRPG formula:</p>
             <pre><code>Modifier = floor((BaseStat - 10) / 2)</code></pre>
-            <p>When an NPC is defined with a stat like <code>STR: 18</code>, the compiler internally calculates a <code>+4</code> modifier. These can be dynamically referenced in <strong>Action</strong> damage strings using keywords like <code>STR</code>, <code>DEX</code>, or <code>PROF</code>.</p>
+            <p>For example, STR: 14 gives a +2 modifier. These modifiers can be referenced in action damage strings using the ability abbreviation (STR, DEX, etc.) or PROF for proficiency.</p>
+            <p>Saving throws are defined similarly, with explicit modifier values.</p>
+            <pre><code>stats {
+  STR: 14
+  DEX: 16
+  HP: 20
+  AC: 15
+  proficiency: 2
+}
+saving_throws {
+  STR: 2
+  DEX: 3
+}</code></pre>
+        </section>
+
+        <section id="actions">
+            <h2>Actions</h2>
+            <p>NPCs can define actions, which are abilities or attacks with custom properties. Actions support damage strings that can reference stat modifiers.</p>
+            <pre><code>action "Scimitar" {
+  type: "melee"
+  damage: "1d6 + STR + PROF"
+  description: "A curved blade attack"
+}</code></pre>
+            <p>The damage string can include dice notation and modifier references like STR, DEX, CON, INT, WIS, CHA, PROF.</p>
+        </section>
+
+        <section id="nesting">
+            <h2>Nesting</h2>
+            <p>Entities can be nested to create hierarchical structures. NPCs and Encounters can be placed inside Locations or other Encounters.</p>
+            <pre><code>Location "Castle" {
+  safety: 8
+  NPC "Guard" {
+    stats { HP: 20 }
+  }
+  Encounter "Ambush" {
+    difficulty: "medium"
+    NPC "Archer" {
+      stats { DEX: 16 }
+    }
+  }
+}</code></pre>
+            <p>This allows building complex worlds with entities contained within locations.</p>
+        </section>
+
+        <section id="print">
+            <h2>Print Statement</h2>
+            <p>The print statement allows adding narrative text or debug output to the program.</p>
+            <pre><code>print("The party hears distant footsteps.");</code></pre>
+            <p>It takes a string argument and outputs it during compilation or execution.</p>
         </section>
 
         <section id="grammar">
-            <h2>Language Grammar</h2>
-            <p>The syntax is strictly enforced by an <strong>Ohm.js</strong> grammar to ensure data consistency across your campaign files.</p>
-            <pre><code>NPC = "NPC" string "{" NPCBody "}"
-Location = "Location" string "{" LocationBody "}"
-Property = identifier ":" (number | string)
-StatBlock = "stats" "{" Stat* "}"
-Action = "Action" string "{" ActionBody "}"</code></pre>
+
+        <section id="compiler">
+            <h2>Compiler Features</h2>
+            <p>The DungeonScript compiler provides several features for robust TTRPG preparation:</p>
+            <ul>
+                <li><strong>Validation</strong>: Syntax checking and semantic validation ensure correct structure.</li>
+                <li><strong>Null Safety</strong>: Missing stats default to 10 (+0) for compatibility.</li>
+                <li><strong>Modifier Calculation</strong>: Automatic calculation of ability modifiers from base stats.</li>
+                <li><strong>Optimization</strong>: Merging duplicate properties and normalizing declarations.</li>
+                <li><strong>Output Generation</strong>: Compiles to Markdown suitable for notes and VTT import.</li>
+                <li><strong>JSON Conversion</strong>: Helper to convert JSON monster data to DungeonScript source.</li>
+            </ul>
+            <p>The compiler pipeline includes parsing, analysis, optimization, and generation stages.</p>
         </section>
 
-        <section id="safety">
-            <h2>Compiler Safety & Validation</h2>
-            <p>The compiler includes built-in semantic checks to catch common preparation errors before they reach your game table:</p>
-            <ul>
-                <li><strong>HP Validation</strong>: Ensures all NPCs have a health pool greater than 0.</li>
-                <li><strong>Null Safety</strong>: Missing stats default to 10 (+0) to ensure compatibility with VTT importers.</li>
-                <li><strong>Reference Checks</strong>: Ensures that damage strings only reference valid stat abbreviations.</li>
-            </ul>
+        <section id="grammar">
+            <h2>Grammar</h2>
+            <p>The DungeonScript syntax is defined by the following Ohm.js grammar:</p>
+            <pre><code>dungeonscript {
+    Program     = Declaration+
+    Declaration = NPC | Location | Encounter | PrintStmt | space
+
+    PrintStmt   = "print" "(" str ")" ";"
+
+    Encounter = "Encounter" (str | identifier) "{" EncounterBody "}"
+    EncounterBody = (Item | space)*
+    
+    Item        = property | Encounter | NPC
+
+    Location  = "Location" (str | identifier) "{" LocationBody "}"
+    LocationBody = (property | Item | space)*
+
+    NPC       = "NPC" (str | identifier) "{" NPCBody "}"
+    NPCBody     = (StatBlock | SavingThrowBlock | Action | property | space)*
+
+    StatBlock   = "stats" Stats
+    SavingThrowBlock = "saving_throws" Stats
+    
+    Stats       = "{" Stat* "}"
+    Stat        = identifier ":" number
+
+    Action    = "action" (str | identifier) "{" ActionBody "}"
+    ActionBody  = (property | space)*
+
+    identifier  = ~keyword alnum+
+    number      = digit+
+    property    = identifier ":" space* value
+    value       = number | str | identifier
+    
+    keyword     = "NPC" | "Location" | "Encounter" | "stats" | "saving_throws" | "action" | "print"
+    str         = "\"" (~"\"" any)* "\""
+}</code></pre>
         </section>
 
         <section id="examples">
-            <h2>Complete Example</h2>
-            <p>A full <code>.ds</code> file demonstrating how entities relate to one another:</p>
+            <h2>Examples</h2>
+            <p>Here are complete examples demonstrating DungeonScript syntax:</p>
+            
+            <h3>NPC Example</h3>
             <pre><code>NPC "Goblin" {
-  stats { DEX: 14, HP: 7, AC: 13 }
-  Action "Nimble Escape" { type: "utility" }
-}
-
-Location "Cragmaw Hideout" {
-  environment: "Cave"
-  "Goblin" 
+  stats {
+    STR: 8
+    DEX: 14
+    CON: 10
+    INT: 10
+    WIS: 8
+    CHA: 8
+    HP: 7
+    AC: 15
+    proficiency: 2
+  }
+  saving_throws {
+    STR: -1
+    DEX: 2
+  }
+  action "Scimitar" {
+    type: "melee"
+    damage: "1d6 + STR + PROF"
+  }
 }</code></pre>
+
+            <h3>Location with Nesting</h3>
+            <pre><code>Location "Cragmaw Hideout" {
+  safety: 8
+  environment: "Cave"
+  NPC "Guard" {
+    stats {
+      HP: 20
+    }
+  }
+  Encounter "Ambush" {
+    difficulty: "medium"
+    type: "trap"
+    description: "A hidden pit in the corridor."
+  }
+}</code></pre>
+
+            <h3>Print Statement</h3>
+            <pre><code>print("The party hears distant footsteps.");</code></pre>
         </section>
 
         <footer style="margin-top: 80px; font-size: 0.85rem; color: #8b949e; border-top: 1px solid #30363d; padding-top: 20px;">
