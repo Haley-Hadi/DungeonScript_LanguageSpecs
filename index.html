@@ -109,8 +109,8 @@
             <li><a href="#print">Print Statement</a></li>
             <li><a href="#compiler">Compiler Features</a></li>
             <li><a href="#grammar">Grammar</a></li>
-            <li><a href="#markdown">Markdown Output</a></li>
             <li><a href="#json-conversion">JSON Conversion</a></li>
+            <li><a href="#markdown">Markdown Output</a></li>
             <li><a href="#cli">CLI Commands</a></li>
         </ul>
     </nav>
@@ -119,6 +119,8 @@
         <section id="intro">
             <h1>DungeonScript Specification</h1>
             <p>DungeonScript is a domain-specific language (DSL) tailored for TTRPG Game Masters. It allows you to define complex NPCs, locations, and encounters using a readable, structured syntax that compiles into usable formats for VTTs and note-taking apps.</p>
+            
+            <p><strong>View the source code on GitHub: <a href="https://github.com/Haley-Hadi/DungeonScript" target="_blank" rel="noopener noreferrer">Haley-Hadi/DungeonScript</a></strong></p>
             
             <p>This document defines the DungeonScript language.</p>
 
@@ -299,67 +301,6 @@ saving_throws {
 }</code></pre>
         </section>
 
-        <section id="markdown">
-            <h2>Markdown Output</h2>
-            <p>The compiler can generate Markdown output from DungeonScript source, suitable for notes and VTT import. This conversion is performed by the generator pipeline.</p>
-            
-            <h3>Example: Input DungeonScript</h3>
-            <pre><code>NPC "Goblin Warrior" {
-  stats {
-    STR: 15
-    DEX: 14
-    CON: 12
-    INT: 10
-    WIS: 11
-    CHA: 10
-    HP: 22
-    AC: 15
-    proficiency: 2
-  }
-  action "Scimitar" {
-    type: "melee"
-    damage: "1d6 + STR + PROF"
-  }
-}</code></pre>
-
-            <h3>Example: Generated Markdown Output</h3>
-            <pre><code>---
-type: npc
-name: Goblin Warrior
-HP: 22
-AC: 15
----
-
-# Goblin Warrior
-
-**Proficiency Bonus:** +2
-
-## Stats
-| Stat | Value | Modifier |
-| :--- | :--- | :--- |
-| STR | 15 | +2 |
-| DEX | 14 | +2 |
-| CON | 12 | +1 |
-| INT | 10 | +0 |
-| WIS | 11 | +0 |
-| CHA | 10 | +0 |
-
-## Actions and Attacks
-
-### Scimitar
-- **Type**: melee
-- **Damage/Effect**: 1d6 +2 +2
-</code></pre>
-            
-            <p>Key features of the Markdown output:</p>
-            <ul>
-                <li><strong>YAML Frontmatter</strong>: Metadata for VTT systems and tracking</li>
-                <li><strong>Automatic Modifier Calculation</strong>: Ability scores are converted to modifiers using the formula: floor((score - 10) / 2)</li>
-                <li><strong>Damage String Resolution</strong>: Tokens like STR, DEX, PROF are replaced with calculated modifiers</li>
-                <li><strong>Stat Tables</strong>: Organized presentation of all ability scores and modifiers</li>
-            </ul>
-        </section>
-
         <section id="json-conversion">
             <h2>JSON to DungeonScript Conversion</h2>
             <p>The <code>ds-generator.js</code> module converts standard JSON monster data (like from D&D 5e sources) into DungeonScript AST and source code.</p>
@@ -428,6 +369,67 @@ const source = compile(jsonSource, "js") // Convert to Markdown</code></pre>
             <p>To convert a JSON monster file to DungeonScript using the command line:</p>
             <pre><code>npm run generate-ds path/to/monster.json</code></pre>
             <p>This will output the generated DungeonScript source to stdout.</p>
+        </section>
+
+        <section id="markdown">
+            <h2>Markdown Output</h2>
+            <p>The compiler can generate Markdown output from DungeonScript source, suitable for notes and VTT import. This conversion is performed by the generator pipeline.</p>
+            
+            <h3>Example: Input DungeonScript</h3>
+            <pre><code>NPC "Goblin Warrior" {
+  stats {
+    STR: 15
+    DEX: 14
+    CON: 12
+    INT: 10
+    WIS: 11
+    CHA: 10
+    HP: 22
+    AC: 15
+    proficiency: 2
+  }
+  action "Scimitar" {
+    type: "melee"
+    damage: "1d6 + STR + PROF"
+  }
+}</code></pre>
+
+            <h3>Example: Generated Markdown Output</h3>
+            <pre><code>---
+type: npc
+name: Goblin Warrior
+HP: 22
+AC: 15
+---
+
+# Goblin Warrior
+
+**Proficiency Bonus:** +2
+
+## Stats
+| Stat | Value | Modifier |
+| :--- | :--- | :--- |
+| STR | 15 | +2 |
+| DEX | 14 | +2 |
+| CON | 12 | +1 |
+| INT | 10 | +0 |
+| WIS | 11 | +0 |
+| CHA | 10 | +0 |
+
+## Actions and Attacks
+
+### Scimitar
+- **Type**: melee
+- **Damage/Effect**: 1d6 +2 +2
+</code></pre>
+            
+            <p>Key features of the Markdown output:</p>
+            <ul>
+                <li><strong>YAML Frontmatter</strong>: Metadata for VTT systems and tracking</li>
+                <li><strong>Automatic Modifier Calculation</strong>: Ability scores are converted to modifiers using the formula: floor((score - 10) / 2)</li>
+                <li><strong>Damage String Resolution</strong>: Tokens like STR, DEX, PROF are replaced with calculated modifiers</li>
+                <li><strong>Stat Tables</strong>: Organized presentation of all ability scores and modifiers</li>
+            </ul>
         </section>
 
         <section id="cli">
