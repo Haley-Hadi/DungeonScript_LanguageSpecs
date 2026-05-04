@@ -107,9 +107,11 @@
             <li><a href="#actions">Actions</a></li>
             <li><a href="#nesting">Nesting</a></li>
             <li><a href="#print">Print Statement</a></li>
+            <li><a href="#compiler">Compiler Features</a></li>
             <li><a href="#grammar">Grammar</a></li>
             <li><a href="#examples">Examples</a></li>
-            <li><a href="#compiler">Compiler Features</a></li>
+            <li><a href="#markdown">Markdown Output</a></li>
+            <li><a href="#json-conversion">JSON Conversion</a></li>
         </ul>
     </nav>
 
@@ -344,8 +346,134 @@ saving_throws {
             <pre><code>print("The party hears distant footsteps.");</code></pre>
         </section>
 
+        <section id="markdown">
+            <h2>Markdown Output</h2>
+            <p>The compiler can generate Markdown output from DungeonScript source, suitable for notes and VTT import. This conversion is performed by the generator pipeline.</p>
+            
+            <h3>Example: Input DungeonScript</h3>
+            <pre><code>NPC "Goblin Warrior" {
+  stats {
+    STR: 15
+    DEX: 14
+    CON: 12
+    INT: 10
+    WIS: 11
+    CHA: 10
+    HP: 22
+    AC: 15
+    proficiency: 2
+  }
+  action "Scimitar" {
+    type: "melee"
+    damage: "1d6 + STR + PROF"
+  }
+}</code></pre>
+
+            <h3>Example: Generated Markdown Output</h3>
+            <pre><code>---
+type: npc
+name: Goblin Warrior
+HP: 22
+AC: 15
+---
+
+# Goblin Warrior
+
+**Proficiency Bonus:** +2
+
+## Stats
+| Stat | Value | Modifier |
+| :--- | :--- | :--- |
+| STR | 15 | +2 |
+| DEX | 14 | +2 |
+| CON | 12 | +1 |
+| INT | 10 | +0 |
+| WIS | 11 | +0 |
+| CHA | 10 | +0 |
+
+## Actions and Attacks
+
+### Scimitar
+- **Type**: melee
+- **Damage/Effect**: 1d6 +2 +2
+</code></pre>
+            
+            <p>Key features of the Markdown output:</p>
+            <ul>
+                <li><strong>YAML Frontmatter</strong>: Metadata for VTT systems and tracking</li>
+                <li><strong>Automatic Modifier Calculation</strong>: Ability scores are converted to modifiers using the formula: floor((score - 10) / 2)</li>
+                <li><strong>Damage String Resolution</strong>: Tokens like STR, DEX, PROF are replaced with calculated modifiers</li>
+                <li><strong>Stat Tables</strong>: Organized presentation of all ability scores and modifiers</li>
+            </ul>
+        </section>
+
+        <section id="json-conversion">
+            <h2>JSON to DungeonScript Conversion</h2>
+            <p>The <code>ds-generator.js</code> module converts standard JSON monster data (like from D&D 5e sources) into DungeonScript AST and source code.</p>
+            
+            <h3>Example: Input JSON Monster</h3>
+            <pre><code>{
+  "name": "Goblin",
+  "str": 8,
+  "dex": 14,
+  "con": 10,
+  "int": 10,
+  "wis": 8,
+  "cha": 8,
+  "hp": { "average": 7 },
+  "ac": [15],
+  "cr": 0.25,
+  "action": [
+    {
+      "name": "Scimitar",
+      "entries": ["Melee Weapon Attack: +4 to hit, reach 5 ft., 1d6+2 damage"]
+    }
+  ]
+}</code></pre>
+
+            <h3>Example: Generated DungeonScript</h3>
+            <pre><code>NPC "Goblin" {
+  stats {
+    STR: 8
+    DEX: 14
+    CON: 10
+    INT: 10
+    WIS: 8
+    CHA: 8
+  }
+  HP: 7
+  AC: 15
+  CR: 0.25
+  action "Scimitar" {
+    description: "Melee Weapon Attack: +4 to hit, reach 5 ft., 1d6+2 damage"
+  }
+}</code></pre>
+
+            <h3>Conversion Process</h3>
+            <p>The conversion handles:</p>
+            <ul>
+                <li><strong>Ability Scores</strong>: Maps STR, DEX, CON, INT, WIS, CHA from JSON to DungeonScript stats block</li>
+                <li><strong>Hit Points</strong>: Extracts average HP value from JSON structure</li>
+                <li><strong>Armor Class</strong>: Converts array or single AC value</li>
+                <li><strong>Challenge Rating</strong>: Preserves CR for encounter building</li>
+                <li><strong>Actions &amp; Traits</strong>: Converts actions array to DungeonScript action blocks</li>
+                <li><strong>Additional Properties</strong>: Preserves speed, languages, and other attributes</li>
+            </ul>
+
+            <h3>Usage</h3>
+            <p>The conversion can be invoked programmatically:</p>
+            <pre><code>import { convertMonsterToAST } from "./src/ds-generator.js"
+
+const jsonMonster = { /* ... */ }
+const ast = convertMonsterToAST(jsonMonster)
+
+// Or use the compiler pipeline:
+import compile from "./src/compiler.js"
+const source = compile(jsonSource, "js") // Convert to Markdown</code></pre>
+        </section>
+
         <footer style="margin-top: 80px; font-size: 0.85rem; color: #8b949e; border-top: 1px solid #30363d; padding-top: 20px;">
-            <p>Documentation for DungeonScript v1.0. Created by Haley Hadiwidjojo. Built with Ohm.js.</p>
+            <p>Documentation for DungeonScript. Created by Haley Hadiwidjojo. Built with Ohm.js.</p>
         </footer>
     </main>
 </div>
