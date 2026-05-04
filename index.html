@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DungeonScript | Language Specification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    <style>
+        body { box-sizing: border-box; min-width: 200px; max-width: 980px; margin: 0 auto; padding: 45px; }
+        .sidebar { position: fixed; left: 20px; top: 50px; width: 200px; font-family: sans-serif; }
+        @media (max-width: 1200px) { .sidebar { position: static; width: 100%; margin-bottom: 20px; } }
+        code { background-color: #f6f8fa; padding: 2px 4px; border-radius: 6px; }
+        pre { background-color: #f6f8fa; padding: 16px; border-radius: 6px; overflow: auto; }
+    </style>
+</head>
+<body class="markdown-body">
+    <nav class="sidebar">
+        <h3>Contents</h3>
+        <ul>
+            <li><a href="#intro">Introduction</a></li>
+            <li><a href="#grammar">Grammar</a></li>
+            <li><a href="#examples">Examples</a></li>
+        </ul>
+    </nav>
+
+    <section id="intro">
+        <h1>DungeonScript Specification</h1>
+        <p>DungeonScript is a domain-specific language for TTRPG Game Masters. It automates modifier calculations and organizes world-building entities[cite: 3, 6].</p>
+    </section>
+
+    <section id="grammar">
+        <h2>Grammar</h2>
+        <p>Defined using <code>Ohm.js</code>, the grammar ensures structural integrity for NPCs and Locations.</p>
+        <pre><code>NPC = "NPC" string "{" NPCBody "}"
+Stat = identifier ":" number</code></pre>
+    </section>
+
+    <section id="examples">
+        <h2>Examples</h2>
+        <pre><code>NPC "Brog" { stats { STR: 18 HP: 45 } }</code></pre>
+    </section>
+</body>
+</html>
